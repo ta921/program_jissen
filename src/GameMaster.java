@@ -33,7 +33,12 @@ public class GameMaster extends Canvas implements KeyListener{
         buf_gc.fillRect(0, 0, imgW, imgH);
         switch (mode) {
         case 0:
-            buf_gc.drawImage(charaImg, 0, 0, 100, 200, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, this);
+            buf_gc.setColor(Color.black);
+            buf_gc.drawRect(0, 0, 100, 200);
+            buf_gc.drawImage(charaImg, 0, 0, 100, 200, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
+            buf_gc.drawRect(0, 0, 100, 200);
+
+            chara.move(buf_gc, imgW, imgH);
             break;
         }
         g.drawImage(buf, 0, 0, this);
@@ -68,18 +73,22 @@ public class GameMaster extends Canvas implements KeyListener{
         switch (cd) {
             case KeyEvent.VK_LEFT:
             chara.lflag = true;
+            System.out.println(" [a] pressed");
             break;
 
         case KeyEvent.VK_RIGHT:
             chara.rflag = true;
+            System.out.println(" [d] pressed");
             break;
 
         case KeyEvent.VK_UP:
             chara.uflag = true;
+            System.out.println(" [w] pressed");
             break;
 
         case KeyEvent.VK_DOWN:
             chara.dflag = true;
+            System.out.println(" [s] pressed");
             break;
         }
     }

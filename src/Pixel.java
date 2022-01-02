@@ -28,7 +28,7 @@ public class Pixel extends Frame implements Runnable {
     public void run() {
         try{
             while (true) {
-                Thread.sleep(20);
+                Thread.sleep(100);
                 gm.repaint();
             }
         }

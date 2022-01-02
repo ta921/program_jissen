@@ -15,11 +15,11 @@ class Character extends MovingObject{
         w = 5;
         h = 5;
 
-        xImage = 10;
-        yImage = 30;
+        xImage = 16;
+        yImage = 41;
 
-        wImage = 10;
-        hImage = 30;
+        wImage = 13;
+        hImage = 22;
 
         lflag = false;
         rflag = false;
@@ -32,34 +32,33 @@ class Character extends MovingObject{
     }
 
     void move (Graphics buf, int apWidth, int apHeight) {
-        System.out.println("move");
-        if (xImage > 145){
-            xImage = 0;
+        if (xImage > 80){
+            xImage = 16;
         }
-        xImage+=40;
+        xImage+=32;
 
-        if (lflag && !rflag && x > w){
+        if (lflag && !rflag){
             x = x - v;
             vec = 4;
-            yImage = 145;
+            yImage = 103;
         }
 
-        if (rflag && !lflag && x > apWidth - w){
+        if (rflag && !lflag){
             x = x + v;
             vec = 3;
-            yImage = 235;
+            yImage = 168;
         }
 
-        if (uflag && !dflag && y > h){
+        if (uflag && !dflag){
             y = y - v;
             vec = 1;
-            yImage = 325;
+            yImage = 227;
         }
 
-        if (dflag && !uflag && x > apHeight - y){
+        if (dflag && !uflag){
             y = y + v;
             vec = 2;
-            yImage = 55;
+            yImage = 41;
         }
     }
 }
