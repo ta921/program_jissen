@@ -13,8 +13,13 @@ public class GameMaster extends Canvas implements KeyListener{
 
     private int len = 40; //最小単位
 
-    Character chara = new Character(imgW, imgH);
+    Character chara = new Character(imgW, imgH);    
     Image charaImg = this.getToolkit().getImage("character.png");
+
+    MapA map = new MapA(imgW, imgH);
+
+    Image mapImgData = this.getToolkit().getImage("mapImage.png");
+    Image mapImg;
 
     GameMaster(int imgW, int imgH){
         this.imgW = imgW;
@@ -22,6 +27,19 @@ public class GameMaster extends Canvas implements KeyListener{
         setSize(imgW, imgH);
 
         addKeyListener(this);
+
+        //map.repaint();
+    }
+
+    public void backPaint(){
+        for(i=0; i<24; i++){
+            for(j=0; j<32; j++){
+                if (map.map[i][j] == 1){
+                    buf_gc.drawImage(mapImgData, 40*j, 40*i, 40*j+40, 40*i+40, map.x-map.w, map.y-map.h, map.x+map.w, map.y+map.h, null);
+                }
+
+            }
+        }
     }
 
     public void addNotify(){
@@ -33,10 +51,15 @@ public class GameMaster extends Canvas implements KeyListener{
     public void paint(Graphics g){
         buf_gc.setColor(Color.white);
         buf_gc.fillRect(0, 0, imgW, imgH);
+        backPaint();
+        
         switch (mode) {
         case 0:
             buf_gc.setColor(Color.black);
             buf_gc.drawRect(0, 0, 100, 200);
+
+            buf_gc.drawImage(map.mapImg, 0, 0, null);
+
             buf_gc.drawImage(charaImg, 0+chara.x, 0+chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
             buf_gc.drawRect(0, 0, 100, 200);
 
