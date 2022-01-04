@@ -19,7 +19,7 @@ class Character extends MovingObject{
         yImage = 41;
 
         wImage = 13;
-        hImage = 22;
+        hImage = 23;
 
         lflag = false;
         rflag = false;
@@ -40,7 +40,7 @@ class Character extends MovingObject{
         if (lflag && !rflag){
             x = x - v;
             vec = 4;
-            yImage = 103;
+            yImage = 104;
         }
 
         if (rflag && !lflag){
@@ -52,7 +52,7 @@ class Character extends MovingObject{
         if (uflag && !dflag){
             y = y - v;
             vec = 1;
-            yImage = 227;
+            yImage = 232;
         }
 
         if (dflag && !uflag){
