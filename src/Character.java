@@ -10,7 +10,7 @@ class Character extends MovingObject{
         x = (int)(apWidth/2);
         y = (int)(apHeight/2);
 
-        v = 1;
+        v = 5;
 
         w = 5;
         h = 5;

@@ -11,6 +11,8 @@ public class GameMaster extends Canvas implements KeyListener{
     private int mode = 0 ;
     private int i, j;
 
+    private int len = 40; //最小単位
+
     Character chara = new Character(imgW, imgH);
     Image charaImg = this.getToolkit().getImage("character.png");
 
@@ -35,7 +37,7 @@ public class GameMaster extends Canvas implements KeyListener{
         case 0:
             buf_gc.setColor(Color.black);
             buf_gc.drawRect(0, 0, 100, 200);
-            buf_gc.drawImage(charaImg, 0, 0, 100, 200, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
+            buf_gc.drawImage(charaImg, 0+chara.x, 0+chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
             buf_gc.drawRect(0, 0, 100, 200);
 
             chara.move(buf_gc, imgW, imgH);
