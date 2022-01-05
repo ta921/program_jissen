@@ -6,6 +6,8 @@ class Character extends MovingObject{
     boolean uflag;
     boolean dflag;
 
+    int i,j;
+
     Character (int apWidth, int apHeight) {
         x = (int)(apWidth/2);
         y = (int)(apHeight/2);

@@ -1,15 +1,6 @@
-import java.awt.*;
-import java.awt.event.*;
-
-class MapA extends Frame{
-
-    private int imgW, imgH;
+class MapA extends Map{
 
     int[][] map = new int[32][24];
-
-    Graphics imgPen;
-    Image mapImgData = this.getToolkit().getImage("mapImage.png");
-    Image mapImg;
 
     int x = 50;
     int y = 50;
@@ -18,18 +9,9 @@ class MapA extends Frame{
 
     int i, j;
     
-    public void addNotify(){
-        super.addNotify();
-        mapImg = createImage(imgW, imgH);
-        imgPen = mapImg.getGraphics();
-    }
 
-    MapA (int imgW, int imgH) {
+    MapA () {
 
-        this.setSize(imgW, imgH);
-
-        this.imgW = imgW;
-        this.imgH = imgH;
 
         int[][] mapA = {
         //  {0,0,0,0,5,0,0,0,0,1,0,0,0,0,5,0,0,0,0,1,0,0,0,0,5,0,0,0,0,1,0,0}
@@ -61,21 +43,5 @@ class MapA extends Frame{
 
         map = mapA;
 
-    }
-
-    public void paint(Graphics g){
-        for(i=0; i<24; i++){
-            for(j=0; j<32; j++){
-                if (map[i][j] == 1){
-                    imgPen.drawImage(mapImgData, 40*j, 40*i, 40*j+40, 40*i+40, x-w, y-h, x+w, y+h, null);
-                }
-
-            }
-        }
-        System.out.println("move");
-    }
-
-    public void update(Graphics gc) {
-        paint(gc);
     }
 }

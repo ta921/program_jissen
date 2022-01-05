@@ -16,7 +16,7 @@ public class GameMaster extends Canvas implements KeyListener{
     Character chara = new Character(imgW, imgH);    
     Image charaImg = this.getToolkit().getImage("character.png");
 
-    MapA map = new MapA(imgW, imgH);
+    MapA map = new MapA();
 
     Image mapImgData = this.getToolkit().getImage("mapImage.png");
     Image mapImg;
@@ -58,12 +58,13 @@ public class GameMaster extends Canvas implements KeyListener{
             buf_gc.setColor(Color.black);
             buf_gc.drawRect(0, 0, 100, 200);
 
-            buf_gc.drawImage(map.mapImg, 0, 0, null);
 
             buf_gc.drawImage(charaImg, 0+chara.x, 0+chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
             buf_gc.drawRect(0, 0, 100, 200);
 
-            chara.move(buf_gc, imgW, imgH);
+            if (!map.wallColissionCheck(chara)){
+                chara.move(buf_gc, imgW, imgH);
+            }
             break;
         }
         g.drawImage(buf, 0, 0, this);
