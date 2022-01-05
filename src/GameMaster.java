@@ -11,7 +11,7 @@ public class GameMaster extends Canvas implements KeyListener{
     private int mode = 0 ;
     private int i, j;
 
-    private int len = 40; //最小単位
+    private int len = 39; //最小単位40
 
     Character chara = new Character(imgW, imgH);    
     Image charaImg = this.getToolkit().getImage("character.png");
@@ -59,12 +59,13 @@ public class GameMaster extends Canvas implements KeyListener{
             buf_gc.drawRect(0, 0, 100, 200);
 
 
-            buf_gc.drawImage(charaImg, 0+chara.x, 0+chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
+            buf_gc.drawImage(charaImg, chara.x, chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
             buf_gc.drawRect(0, 0, 100, 200);
 
-            if (!map.wallColissionCheck(chara)){
-                chara.move(buf_gc, imgW, imgH);
-            }
+            //if (!map.wallColissionCheck(chara)){
+            chara.move(buf_gc, imgW, imgH);
+            System.out.println(map.map[chara.x/40][chara.y/40]);
+            //}
             break;
         }
         g.drawImage(buf, 0, 0, this);
@@ -97,24 +98,20 @@ public class GameMaster extends Canvas implements KeyListener{
     public void keyPressed(KeyEvent ke) {
         int cd = ke.getKeyCode();
         switch (cd) {
-            case KeyEvent.VK_LEFT:
-            chara.lflag = true;
-            System.out.println(" [a] pressed");
+        case KeyEvent.VK_LEFT:
+            chara.vec = 4;
             break;
 
         case KeyEvent.VK_RIGHT:
-            chara.rflag = true;
-            System.out.println(" [d] pressed");
+            chara.vec = 2;
             break;
 
         case KeyEvent.VK_UP:
-            chara.uflag = true;
-            System.out.println(" [w] pressed");
+            chara.vec = 1;
             break;
 
         case KeyEvent.VK_DOWN:
-            chara.dflag = true;
-            System.out.println(" [s] pressed");
+            chara.vec = 3;
             break;
         }
     }

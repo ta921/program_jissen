@@ -9,13 +9,13 @@ class Character extends MovingObject{
     int i,j;
 
     Character (int apWidth, int apHeight) {
-        x = (int)(apWidth/2);
-        y = (int)(apHeight/2);
+        x = 0;
+        y = 0;
 
         v = 5;
 
-        w = 5;
-        h = 5;
+        w = 39;
+        h = 39;
 
         xImage = 16;
         yImage = 41;
@@ -39,27 +39,23 @@ class Character extends MovingObject{
         }
         xImage+=32;
 
-        if (lflag && !rflag){
+        if (vec == 4){
             x = x - v;
-            vec = 4;
             yImage = 104;
         }
 
-        if (rflag && !lflag){
+        if (vec == 2){
             x = x + v;
-            vec = 3;
             yImage = 168;
         }
 
-        if (uflag && !dflag){
+        if (vec == 1){
             y = y - v;
-            vec = 1;
             yImage = 232;
         }
 
-        if (dflag && !uflag){
+        if (vec == 3){
             y = y + v;
-            vec = 2;
             yImage = 41;
         }
     }
