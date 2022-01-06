@@ -32,8 +32,8 @@ public class GameMaster extends Canvas implements KeyListener{
     }
 
     public void backPaint(){
-        for(i=0; i<24; i++){
-            for(j=0; j<32; j++){
+        for(i=0; i<18; i++){
+            for(j=0; j<18; j++){
                 if (map.map[i][j] == 1){
                     buf_gc.drawImage(mapImgData, 40*j, 40*i, 40*j+40, 40*i+40, map.x-map.w, map.y-map.h, map.x+map.w, map.y+map.h, null);
                 }
@@ -59,16 +59,33 @@ public class GameMaster extends Canvas implements KeyListener{
             buf_gc.drawRect(0, 0, 100, 200);
 
 
-            buf_gc.drawImage(charaImg, chara.x, chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
-            buf_gc.drawRect(0, 0, 100, 200);
+            //buf_gc.drawImage(charaImg, chara.x, chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
+            buf_gc.setColor(Color.red);
+            buf_gc.drawRect(0, 0, 719, 719);
 
-            //if (!map.wallColissionCheck(chara)){
-            chara.move(buf_gc, imgW, imgH);
-            System.out.println(map.map[chara.x/40][chara.y/40]);
-            //}
+            if(!map.wallColissionCheck(chara)){
+                chara.move(buf_gc, imgW, imgH);
+            //printAroundWall();
+            }else{
+                chara.turn();
+            }
+            buf_gc.drawImage(charaImg, chara.x, chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
             break;
         }
         g.drawImage(buf, 0, 0, this);
+    }
+
+    public void printAroundWall(){
+        System.out.print(" ");
+        System.out.print(map.map[chara.y/40-1][chara.x/40]);
+        System.out.println(" ");
+        System.out.print(map.map[chara.y/40][chara.x/40-1]);
+        System.out.print(map.map[chara.y/40][chara.x/40]);
+        System.out.println(map.map[chara.y/40][chara.x/40+1]);
+        System.out.print(" ");
+        System.out.print(map.map[chara.y/40+1][chara.x/40]);
+        System.out.println(" ");
+        System.out.println("///////////////////////////////");
     }
 
     public void update(Graphics gc) {

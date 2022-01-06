@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.Random;
 
 class Character extends MovingObject{
     boolean lflag;
@@ -8,9 +9,11 @@ class Character extends MovingObject{
 
     int i,j;
 
+    Random r = new Random();
+
     Character (int apWidth, int apHeight) {
-        x = 0;
-        y = 0;
+        x = 40;
+        y = 40;
 
         v = 5;
 
@@ -58,5 +61,9 @@ class Character extends MovingObject{
             y = y + v;
             yImage = 41;
         }
+    }
+
+    void turn(){
+        this.vec = r.nextInt(4)+1;
     }
 }

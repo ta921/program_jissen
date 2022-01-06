@@ -9,7 +9,7 @@ abstract class MovingObject {
 
     int hp;
     int v;
-    int vec = 1;
+    int vec = 3;
 
     int xImage;
     int yImage;

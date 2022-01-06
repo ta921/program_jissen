@@ -11,7 +11,7 @@ public class Pixel extends Frame implements Runnable {
 
     Pixel() {
         super("Pixel");
-        int cW=1280, cH=960; //キャンパスのサイズ
+        int cW=720, cH=720; //キャンパスのサイズ
         this.setSize(cW, cH); //フレームのサイズを指定
         this.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10)); //キャンパスをフレームに設置
 
@@ -28,11 +28,11 @@ public class Pixel extends Frame implements Runnable {
     public void run() {
         try{
             while (true) {
-                Thread.sleep(100);
+                Thread.sleep(50);
                 gm.repaint();
             }
         }
-        catch (Exception e) {System.out.println("Exception: " +e);}
+    catch (Exception e) {/*System.out.println("Exception: " +e);*/}
     }
     
 }
