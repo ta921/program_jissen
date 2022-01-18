@@ -21,6 +21,10 @@ public class GameMaster extends Canvas implements KeyListener{
     Image mapImgData = this.getToolkit().getImage("mapImage.png");
     Image mapImg;
 
+    boolean isServer = true;
+    Server ser;
+    Client cli;
+
     GameMaster(int imgW, int imgH){
         this.imgW = imgW;
         this.imgH = imgH;
@@ -51,10 +55,21 @@ public class GameMaster extends Canvas implements KeyListener{
     public void paint(Graphics g){
         buf_gc.setColor(Color.white);
         buf_gc.fillRect(0, 0, imgW, imgH);
-        backPaint();
+        //backPaint();
         
         switch (mode) {
         case 0:
+            //スタート画面
+            buf_gc.setColor(Color.black);
+            buf_gc.drawString("wait", 360, 360);
+
+            cli = new Client();
+            cli.run();
+            cli.close();
+            
+            //mode = 1;
+            break;
+        case 1:
             buf_gc.setColor(Color.black);
             buf_gc.drawRect(0, 0, 100, 200);
 

@@ -4,6 +4,7 @@ public class Pixel extends Frame implements Runnable {
 
     Thread th;
     GameMaster gm;
+    boolean isServer;
 
     public static void main(String[] args) {
         new Pixel();
@@ -16,6 +17,7 @@ public class Pixel extends Frame implements Runnable {
         this.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10)); //キャンパスをフレームに設置
 
         gm = new GameMaster(cW, cH);
+
         this.add(gm);
         this.setVisible(true); //可視化
 
