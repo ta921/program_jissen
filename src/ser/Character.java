@@ -10,6 +10,7 @@ class Character extends MovingObject{
     int i,j;
 
     Random r = new Random();
+    int num;
 
     Character (int apWidth, int apHeight) {
         x = 40;

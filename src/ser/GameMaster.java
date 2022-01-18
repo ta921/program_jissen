@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
 
+import javax.management.openmbean.SimpleType;
+
 public class GameMaster extends Canvas implements KeyListener{
 
     Image buf;
@@ -8,10 +10,11 @@ public class GameMaster extends Canvas implements KeyListener{
     Dimension d;
     private int imgW, imgH;
 
-    private int mode = 0 ;
+    private int mode = 0;
     private int i, j;
 
     private int len = 39; //最小単位40
+    int tmp;
 
     Character chara = new Character(imgW, imgH);    
     Image charaImg = this.getToolkit().getImage("character.png");
@@ -23,6 +26,23 @@ public class GameMaster extends Canvas implements KeyListener{
 
     boolean isServer = true;
     Server ser;
+
+    int select = 0;
+    boolean space = false;
+    boolean enter = false;
+    int count = 0;
+    int[] walkPtn = {0,1,2,1};
+
+    int[][][] charaNum = {
+        {{16,232},{16,168},{16,41},{16,104}},
+        {{112,232},{112,168},{112,41},{112,104}},
+        {{208,232},{208,168},{208,41},{208,104}},
+        {{304,232},{304,168},{304,41},{304,104}},
+        {{16,488},{16,424},{16,296},{16,104}},
+        {{112,488},{112,424},{112,296},{112,360}},
+        {{208,488},{208,424},{208,296},{208,360}},
+        {{304,488},{304,424},{304,296},{304,360}},
+    };
 
     GameMaster(int imgW, int imgH){
         this.imgW = imgW;
@@ -54,10 +74,38 @@ public class GameMaster extends Canvas implements KeyListener{
     public void paint(Graphics g){
         buf_gc.setColor(Color.white);
         buf_gc.fillRect(0, 0, imgW, imgH);
+        count+=1;
+        count %= 4;
         //backPaint();
         
         switch (mode) {
         case 0:
+            //スタート画面
+            //select 0 => single, 1=> multi
+
+            buf_gc.setColor(Color.red);
+
+            if (select%2 == 0){
+                buf_gc.drawLine(150, 360, 180, 360);
+            }else{
+                buf_gc.drawLine(550, 360, 580, 360);
+            }
+
+            buf_gc.setColor(Color.black);
+            buf_gc.drawString("single", 150, 360);
+            buf_gc.drawString("multi", 550, 360);
+
+            if(space == true){
+                if (select == 0){
+                    mode = 1;
+                }else{
+                    mode = 1;
+                }
+            }
+
+            space = false;
+            break;
+        case 9:
             //スタート画面
             buf_gc.setColor(Color.black);
             buf_gc.drawString("wait", 360, 360);
@@ -68,12 +116,12 @@ public class GameMaster extends Canvas implements KeyListener{
             
             //mode = 1;
             break;
-        case 1:
+        case 2:
+            len = 39;
+            backPaint();
             buf_gc.setColor(Color.black);
             buf_gc.drawRect(0, 0, 100, 200);
 
-
-            //buf_gc.drawImage(charaImg, chara.x, chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
             buf_gc.setColor(Color.red);
             buf_gc.drawRect(0, 0, 719, 719);
 
@@ -83,10 +131,36 @@ public class GameMaster extends Canvas implements KeyListener{
             }else{
                 chara.turn();
             }
-            buf_gc.drawImage(charaImg, chara.x, chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
+            paintChara(chara.num, chara.vec, chara.x, chara.y);
+            //buf_gc.drawImage(charaImg, chara.x, chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
             break;
+        case 1:
+            //キャラクター選択画面
+            tmp = select%8;
+            len = 99;
+
+            for (i = 0; i<2; i++){
+                for (j=0; j<4; j++){
+                    paintChara(i*4+j, 3, 150*j+20, 150+150*i);
+                    if (tmp == i*4+j){
+                        buf_gc.setColor(Color.red);
+                        buf_gc.drawLine(150*j+20, 150*(i+1)+99,150*j+119, 150*(i+1)+99);
+                    }
+                }
+            }
+
+            
+            if (enter==true){
+                chara.num = tmp;
+                mode =2;
+                enter = false;
+            }
         }
         g.drawImage(buf, 0, 0, this);
+    }
+
+    public void paintChara(int num, int vec, int x, int y){
+        buf_gc.drawImage(charaImg, x, y, len+x, len+y, charaNum[num][vec-1][0]-13+32*walkPtn[count], charaNum[num][vec-1][1]-23, charaNum[num][vec-1][0]+13+32*walkPtn[count], charaNum[num][vec-1][1]+23, null);
     }
 
     public void printAroundWall(){
@@ -106,7 +180,13 @@ public class GameMaster extends Canvas implements KeyListener{
         paint(gc);
     }
     
-    public void keyTyped(KeyEvent ke) {}
+    public void keyTyped(KeyEvent ke) {
+        int cd = ke.getKeyCode();
+        switch (cd) {
+        case KeyEvent.VK_SPACE:
+            break;            
+        }
+    }
 
     public void keyReleased(KeyEvent ke) {
         int cd = ke.getKeyCode();
@@ -119,10 +199,14 @@ public class GameMaster extends Canvas implements KeyListener{
             break;
         case KeyEvent.VK_UP:
             chara.uflag = false;
+            select-=1;
             break;
         case KeyEvent.VK_DOWN:
             chara.dflag = false;
+            select+=1;
             break;
+        case KeyEvent.VK_SPACE:
+            break;     
         }
     }
 
@@ -144,6 +228,15 @@ public class GameMaster extends Canvas implements KeyListener{
         case KeyEvent.VK_DOWN:
             chara.vec = 3;
             break;
+
+        case KeyEvent.VK_SPACE:
+            space = true;
+            break;
+        
+        case KeyEvent.VK_ENTER:
+            enter = true;
+            break;
         }
+        
     }
 }
