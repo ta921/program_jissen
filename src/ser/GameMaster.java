@@ -1,9 +1,12 @@
 import java.awt.*;
 import java.awt.event.*;
-
-import javax.management.openmbean.SimpleType;
+import java.util.Random;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class GameMaster extends Canvas implements KeyListener{
+
+    Random r = new Random();
 
     Image buf;
     Graphics buf_gc;
@@ -13,10 +16,17 @@ public class GameMaster extends Canvas implements KeyListener{
     private int mode = 0;
     private int i, j;
 
+    InetAddress myaddress;
+
     private int len = 39; //最小単位40
     int tmp;
 
-    Character chara = new Character(imgW, imgH);    
+    Character myChara = new Character(imgW, imgH);
+    Character tmpChara = new Character(imgW, imgH);
+    Character[] enemy = new Character[3];
+    Character[] charaList = new Character[4];
+    
+    
     Image charaImg = this.getToolkit().getImage("character.png");
 
     MapA map = new MapA();
@@ -26,8 +36,15 @@ public class GameMaster extends Canvas implements KeyListener{
 
     boolean isServer = true;
     Server ser;
+    Client cli;
+    String changedOutData;
+    String inData;
+    int[] changedInData = new int[4];
+    int[] outData = new int[4];
 
-    int select = 0;
+    boolean isSingle  = true;
+
+    int select = 100;
     boolean space = false;
     boolean enter = false;
     int count = 0;
@@ -52,6 +69,19 @@ public class GameMaster extends Canvas implements KeyListener{
         addKeyListener(this);
 
         //map.repaint();
+        for (i=0; i<4; i++){
+            charaList[i] = new Character(imgW, imgH);
+            if (i>=1) {
+                enemy[i-1] = new Character(imgW, imgH);
+                tmpChara = setChara(tmpChara);
+
+                charaList[i] = enemy[i-1];
+                charaList[i].x = tmpChara.x;
+                charaList[i].y = tmpChara.y;
+            }else{
+                charaList[i] = myChara;
+            }
+        }
     }
 
     public void backPaint(){
@@ -96,9 +126,11 @@ public class GameMaster extends Canvas implements KeyListener{
             buf_gc.drawString("multi", 550, 360);
 
             if(space == true){
-                if (select == 0){
+                if (select %2 == 0){
+                    isSingle = true;
                     mode = 1;
                 }else{
+                    isSingle = false;
                     mode = 1;
                 }
             }
@@ -109,29 +141,71 @@ public class GameMaster extends Canvas implements KeyListener{
             //スタート画面
             buf_gc.setColor(Color.black);
             buf_gc.drawString("wait", 360, 360);
-
-            ser = new Server();
-            ser.run();
-            ser.close();
             
             //mode = 1;
             break;
         case 2:
             len = 39;
             backPaint();
-            buf_gc.setColor(Color.black);
-            buf_gc.drawRect(0, 0, 100, 200);
 
-            buf_gc.setColor(Color.red);
-            buf_gc.drawRect(0, 0, 719, 719);
+            if(!isSingle){
+                if(isServer){
+                    outData[0] = myChara.x;
+                    outData[1] = myChara.y;
+                    outData[2] = myChara.vec;
+                    outData[3] = myChara.hp;
 
-            if(!map.wallColissionCheck(chara)){
-                chara.move(buf_gc, imgW, imgH);
-            //printAroundWall();
-            }else{
-                chara.turn();
+                    changeOutData();
+
+                    ser.runFirst(changedOutData);
+                    inData = ser.line;
+
+                    changeInData();
+                    charaList[1].x = changedInData[0];
+                    charaList[1].y = changedInData[1];
+                    charaList[1].vec = changedInData[2];
+                    charaList[1].hp = changedInData[3];
+
+                }else{
+                    outData[0] = myChara.x;
+                    outData[1] = myChara.y;
+                    outData[2] = myChara.vec;
+                    outData[3] = myChara.hp;
+
+                    changeOutData();
+
+                    ser.runFirst(changedOutData);
+                    inData = ser.line;
+
+                    changeInData();
+                    //charaList[1].x = changedInData[0];
+                    //charaList[1].y = changedInData[1];
+                    //charaList[1].vec = changedInData[2];
+                    //charaList[1].hp = changedInData[3];
+
+                }
             }
-            paintChara(chara.num, chara.vec, chara.x, chara.y);
+
+            for (i = 0; i<4; i++){
+                if(charaList[i].hp == 0){
+                    continue;
+                }
+
+                if(!map.wallColissionCheck(charaList[i])){
+                    charaList[i].move(buf_gc, imgW, imgH);
+                //printAroundWall();
+                }else{
+                    charaList[i].turn();
+                }
+                paintChara(charaList[i].num, charaList[i].vec, charaList[i].x, charaList[i].y);
+
+                for(j=0; j<4; j++){
+                    if(i==j) continue;
+                    if(charaList[j].hp==0) continue;
+
+                    charaList[i].collisionCheck(charaList[j]);
+                }
+            }
             //buf_gc.drawImage(charaImg, chara.x, chara.y, len+chara.x, len+chara.y, chara.xImage-chara.wImage, chara.yImage-chara.hImage, chara.xImage+chara.wImage, chara.yImage+chara.hImage, null);
             break;
         case 1:
@@ -149,31 +223,113 @@ public class GameMaster extends Canvas implements KeyListener{
                 }
             }
 
-            
-            if (enter==true){
-                chara.num = tmp;
-                mode =2;
+            if (enter==true){ //シングルの時の処理
+                if (isSingle){
+                    myChara.num = tmp;
+                    mode =2;
+                }else{ // マルチの時の処理
+                    myChara.num = tmp;
+                    mode = 3;
+                }
+                
                 enter = false;
             }
+            break;
+        case 3://マルチ専用画面
+            buf_gc.setColor(Color.red);
+
+            // 0=>server, 1=>client
+
+            if (select%2 == 0){
+                buf_gc.drawLine(150, 360, 180, 360);
+            }else{
+                buf_gc.drawLine(550, 360, 580, 360);
+            }
+
+            buf_gc.setColor(Color.black);
+            buf_gc.drawString("server", 150, 360);
+            buf_gc.drawString("client", 550, 360);
+
+            if(space == true){
+                if (select %2 == 0){
+                    isServer = true;
+                    mode = 4;
+
+                    buf_gc.setColor(Color.white);
+                    buf_gc.fillRect(0, 0, imgW, imgH);
+                    buf_gc.setColor(Color.black);
+                    buf_gc.drawString("server:"+myaddress.getHostAddress(), 150, 360);
+                }else{
+                    isServer = false;
+                    mode = 5;
+                }
+                space = false;
+            }
+            break;
+        case 4://server用
+            try{
+                myaddress = InetAddress.getLocalHost();
+                buf_gc.setColor(Color.black);
+                buf_gc.drawString("server:"+myaddress.getHostAddress(), 150, 360);
+
+                ser = new Server();
+                ser.runFirst(Integer.valueOf(myChara.num).toString());
+                charaList[1].num = Integer.valueOf(ser.line).intValue();
+                //ser.close();
+
+                mode = 2;
+            }catch (UnknownHostException e){
+                e.printStackTrace();
+            }
+            break;
+        case 5: //client
+            cli = new Client();
+            cli.runFirst(Integer.valueOf(myChara.num).toString());
+            
+            charaList[1].num = Integer.valueOf(cli.line).intValue();
+
+            //cli.close();
+
+            mode = 2;
         }
         g.drawImage(buf, 0, 0, this);
+        enter = false;
+        space = false;
+        //System.out.println(select);
+    }
+
+    public void changeInData(){
+        String tmp = "";
+        int count = 0;
+        for(i=0; i<inData.length(); i++){
+            if(inData.charAt(i) == '/'){
+                changedInData[count]=Integer.valueOf(tmp).intValue();
+                tmp="";
+                count++;
+            }else{
+                tmp += inData.charAt(i);
+            }
+        }
+    }
+
+    public void changeOutData(){
+        changedOutData = "";
+        for (i=0; i<4; i++){
+            changedOutData += Integer.valueOf(outData[i]).toString()+"/";
+        }
     }
 
     public void paintChara(int num, int vec, int x, int y){
         buf_gc.drawImage(charaImg, x, y, len+x, len+y, charaNum[num][vec-1][0]-13+32*walkPtn[count], charaNum[num][vec-1][1]-23, charaNum[num][vec-1][0]+13+32*walkPtn[count], charaNum[num][vec-1][1]+23, null);
     }
 
-    public void printAroundWall(){
-        System.out.print(" ");
-        System.out.print(map.map[chara.y/40-1][chara.x/40]);
-        System.out.println(" ");
-        System.out.print(map.map[chara.y/40][chara.x/40-1]);
-        System.out.print(map.map[chara.y/40][chara.x/40]);
-        System.out.println(map.map[chara.y/40][chara.x/40+1]);
-        System.out.print(" ");
-        System.out.print(map.map[chara.y/40+1][chara.x/40]);
-        System.out.println(" ");
-        System.out.println("///////////////////////////////");
+    public Character setChara(Character chara){ //キャラの位置をセットする
+        chara.set();
+        if(map.map[chara.y/40][chara.x/40] == 1){
+            chara.set();
+        }
+
+        return chara;
     }
 
     public void update(Graphics gc) {
@@ -188,45 +344,27 @@ public class GameMaster extends Canvas implements KeyListener{
         }
     }
 
-    public void keyReleased(KeyEvent ke) {
-        int cd = ke.getKeyCode();
-        switch (cd) {               
-        case KeyEvent.VK_RIGHT:
-            chara.rflag = false;
-            break;
-        case KeyEvent.VK_LEFT:
-            chara.lflag = false;
-            break;
-        case KeyEvent.VK_UP:
-            chara.uflag = false;
-            select-=1;
-            break;
-        case KeyEvent.VK_DOWN:
-            chara.dflag = false;
-            select+=1;
-            break;
-        case KeyEvent.VK_SPACE:
-            break;     
-        }
-    }
+    public void keyReleased(KeyEvent ke) {}
 
     public void keyPressed(KeyEvent ke) {
         int cd = ke.getKeyCode();
         switch (cd) {
         case KeyEvent.VK_LEFT:
-            chara.vec = 4;
+            myChara.vec = 4;
             break;
 
         case KeyEvent.VK_RIGHT:
-            chara.vec = 2;
+            myChara.vec = 2;
             break;
 
         case KeyEvent.VK_UP:
-            chara.vec = 1;
+            myChara.vec = 1;
+            select+=1;
             break;
 
         case KeyEvent.VK_DOWN:
-            chara.vec = 3;
+            myChara.vec = 3;
+            select-=1;
             break;
 
         case KeyEvent.VK_SPACE:
