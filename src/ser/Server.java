@@ -13,6 +13,8 @@ class Server {
 
     String line;
 
+    int connectingClientCount;
+
     Server() {
         try{
             nPort = Integer.parseInt("3000");
@@ -22,6 +24,8 @@ class Server {
             serverSocket = new ServerSocket(nPort);
             
             skt = serverSocket.accept();
+
+            connectingClientCount++;
 
             System.out.println(skt.getInetAddress().getHostName() + " から接続されました");
 

@@ -18,7 +18,7 @@ public class GameMaster extends Canvas implements KeyListener{
 
     InetAddress myaddress;
 
-    private int len = 39; //最小単位40
+    private int len = 39;
     int tmp;
 
     Character myChara = new Character(imgW, imgH);
@@ -39,8 +39,10 @@ public class GameMaster extends Canvas implements KeyListener{
     Client cli;
     String changedOutData;
     String inData;
-    int[] changedInData = new int[4];
-    int[] outData = new int[4];
+    int[] changedInData = new int[32];
+    int[] outData = new int[32];
+    int clientNum;
+    int connectingClientCount = 0;
 
     boolean isSingle  = true;
 
@@ -149,39 +151,42 @@ public class GameMaster extends Canvas implements KeyListener{
             backPaint();
 
             if(!isSingle){
-                if(isServer){
+                if(isServer){ //server
+                    for (i = 0; i<4; i++){
+                        outData[4*i+0] = charaList[i].x;
+                        outData[4*i+1] = charaList[i].y;
+                        outData[4*i+2] = charaList[i].vec;
+                        outData[4*i+3] = charaList[i].hp;
+
+                    }
+
+                    changeOutData(16);
+
+                    ser.runFirst(changedOutData);
+                    inData = ser.line;
+
+                    changeInData(4);
+                    charaList[0].x = changedInData[0];
+                    charaList[0].y = changedInData[1];
+                    charaList[0].vec = changedInData[2];
+                    charaList[0].hp = changedInData[3];
+
+                }else{ //client
                     outData[0] = myChara.x;
                     outData[1] = myChara.y;
                     outData[2] = myChara.vec;
                     outData[3] = myChara.hp;
 
-                    changeOutData();
+                    changeOutData(4);
 
-                    ser.runFirst(changedOutData);
-                    inData = ser.line;
+                    cli.runFirst(changedOutData);
+                    inData = cli.line;
 
-                    changeInData();
+                    changeInData(16);
                     charaList[1].x = changedInData[0];
                     charaList[1].y = changedInData[1];
                     charaList[1].vec = changedInData[2];
                     charaList[1].hp = changedInData[3];
-
-                }else{
-                    outData[0] = myChara.x;
-                    outData[1] = myChara.y;
-                    outData[2] = myChara.vec;
-                    outData[3] = myChara.hp;
-
-                    changeOutData();
-
-                    ser.runFirst(changedOutData);
-                    inData = ser.line;
-
-                    changeInData();
-                    //charaList[1].x = changedInData[0];
-                    //charaList[1].y = changedInData[1];
-                    //charaList[1].vec = changedInData[2];
-                    //charaList[1].hp = changedInData[3];
 
                 }
             }
@@ -255,10 +260,15 @@ public class GameMaster extends Canvas implements KeyListener{
                     isServer = true;
                     mode = 4;
 
-                    buf_gc.setColor(Color.white);
-                    buf_gc.fillRect(0, 0, imgW, imgH);
-                    buf_gc.setColor(Color.black);
-                    buf_gc.drawString("server:"+myaddress.getHostAddress(), 150, 360);
+                    try{
+                        buf_gc.setColor(Color.white);
+                        buf_gc.fillRect(0, 0, imgW, imgH);
+                        myaddress = InetAddress.getLocalHost();
+                        buf_gc.setColor(Color.black);
+                        buf_gc.drawString("server:"+myaddress.getHostAddress(), 150, 360);
+                    }catch (UnknownHostException e){
+                        e.printStackTrace();
+                    }
                 }else{
                     isServer = false;
                     mode = 5;
@@ -273,8 +283,15 @@ public class GameMaster extends Canvas implements KeyListener{
                 buf_gc.drawString("server:"+myaddress.getHostAddress(), 150, 360);
 
                 ser = new Server();
-                ser.runFirst(Integer.valueOf(myChara.num).toString());
-                charaList[1].num = Integer.valueOf(ser.line).intValue();
+
+                for(i=0;i<4;i++){
+                    outData[i] = charaList[i].num;
+                }
+                outData[4] = ser.connectingClientCount;
+                changeOutData(5);
+
+                ser.runFirst(changedOutData);
+                charaList[ser.connectingClientCount].num = Integer.valueOf(ser.line).intValue();
                 //ser.close();
 
                 mode = 2;
@@ -285,8 +302,21 @@ public class GameMaster extends Canvas implements KeyListener{
         case 5: //client
             cli = new Client();
             cli.runFirst(Integer.valueOf(myChara.num).toString());
-            
-            charaList[1].num = Integer.valueOf(cli.line).intValue();
+
+            inData = cli.line;
+
+            changeInData(5);
+            clientNum = changedInData[4];
+
+            for (i=0;i<4;i++){
+                tmp = 0;
+                if(clientNum == i){
+                    continue;
+                }else{
+                    charaList[tmp+1].num = changedInData[i];
+                    tmp++;
+                }
+            }
 
             //cli.close();
 
@@ -298,10 +328,10 @@ public class GameMaster extends Canvas implements KeyListener{
         //System.out.println(select);
     }
 
-    public void changeInData(){
+    public void changeInData(int num){
         String tmp = "";
         int count = 0;
-        for(i=0; i<inData.length(); i++){
+        for(i=0; count<num; i++){
             if(inData.charAt(i) == '/'){
                 changedInData[count]=Integer.valueOf(tmp).intValue();
                 tmp="";
@@ -312,9 +342,9 @@ public class GameMaster extends Canvas implements KeyListener{
         }
     }
 
-    public void changeOutData(){
+    public void changeOutData(int num){
         changedOutData = "";
-        for (i=0; i<4; i++){
+        for (i=0; i<num; i++){
             changedOutData += Integer.valueOf(outData[i]).toString()+"/";
         }
     }
