@@ -50,6 +50,8 @@ class Server {
             
             line = ios.readUTF(); // UTF: Unicode Transformation Format
             dos.writeUTF(outData);
+            System.out.println("送信:"+outData);
+            System.out.println("受信:"+line);
             
         }catch(NumberFormatException  e){
             System.err.println("引数はポート番号です。1000〜65535までの数字を設定してください。");
@@ -62,12 +64,26 @@ class Server {
         }
     }
 
-    public void run (){
+    public void out (String outData){
         try{
-            String str1 = "こんにちは、あなたは 0 番目のお客様です\n";
-            String str2 = "ただいまサーバーの時間は " + (new Date()).toString() + " です\n";
-            dos.writeUTF(str1); // UTF: Unicode Transformation Format
-            dos.writeUTF(str2);
+            dos.writeUTF(outData); // UTF: Unicode Transformation Format
+            System.out.println("送信:"+outData);
+            
+        }catch(NumberFormatException  e){
+            System.err.println("引数はポート番号です。1000〜65535までの数字を設定してください。");
+        }catch(IndexOutOfBoundsException  e){
+            System.err.println("引数はポート番号です。1000〜65535までの数字を設定してください。");
+        }catch(IOException e){
+            System.err.println("入出力エラーです\n" + e);
+        }catch(Exception e){
+            System.err.println(e);
+        }
+    }
+
+    public void in (){
+        try{
+            line = ios.readUTF();
+            System.out.println("受信:"+line);
             
         }catch(NumberFormatException  e){
             System.err.println("引数はポート番号です。1000〜65535までの数字を設定してください。");

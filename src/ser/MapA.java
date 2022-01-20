@@ -50,7 +50,6 @@ class MapA extends Map{
             }
             for (i=0; i<40; i++){
                 if (map[(m.y+m.h)/40-1][(m.x+i)/40] == 1) {
-                    System.out.println("wall w");
                     return true;
                 }
             }
@@ -63,7 +62,6 @@ class MapA extends Map{
             }
             for (i=0; i<40; i++){
                 if(map[(m.y+i)/40][(m.x)/40+1] == 1) {
-                    System.out.println("wall d");
                     return true;
                 }
             }
@@ -76,7 +74,6 @@ class MapA extends Map{
             }
             for (i=0; i<40; i++){
                 if (map[(m.y)/40+1][(m.x+i)/40] == 1) {
-                    System.out.println("wall s");
                     return true;
                 }
             }
@@ -89,7 +86,6 @@ class MapA extends Map{
             }
             for (i=0; i<40; i++){
                 if(map[(m.y+i)/40][(m.x+m.w)/40-1] == 1) {
-                    System.out.println("wall a");
                     return true;
                 }
             }

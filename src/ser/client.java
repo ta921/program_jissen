@@ -4,7 +4,7 @@ import java.util.*;
 
 class Client {
    int nPort = 3000;
-   String strServer = "localhost";
+   String strServer="localhost";
    Socket skt;
    InputStream is;
    DataInputStream ios;
@@ -16,6 +16,10 @@ class Client {
       try{
          if( nPort < 1000 || nPort > 65535 )
             throw new NumberFormatException();
+
+            Scanner scan = new Scanner(System.in);
+            System.out.println("Plsese Enter Server IP address");
+            strServer = scan.next();
 
             skt = new Socket(strServer, nPort);
             is = skt.getInputStream();
@@ -40,6 +44,9 @@ class Client {
          dos.writeUTF(outData);
          line = ios.readUTF();
 
+         System.out.println("送信:"+outData);
+         System.out.println("受信:"+line);
+
       }catch(NumberFormatException  e){
          System.err.println("引数はサーバー名とポート番号です。");
       }catch(IndexOutOfBoundsException  e){
@@ -53,22 +60,37 @@ class Client {
       }
    }
 
-   void run(){
+   public void out (String outData){
       try{
-         System.out.print(ios.readUTF());
-         System.out.println(ios.readUTF());
+          dos.writeUTF(outData); // UTF: Unicode Transformation Format
+          System.out.println("送信:"+outData);
+          
       }catch(NumberFormatException  e){
-         System.err.println("引数はサーバー名とポート番号です。");
+          System.err.println("引数はポート番号です。1000〜65535までの数字を設定してください。");
       }catch(IndexOutOfBoundsException  e){
-         System.err.println("引数はサーバー名とポート番号です。");
-      }catch(UnknownHostException e){
-         System.err.println("サーバーが見つかりません");
+          System.err.println("引数はポート番号です。1000〜65535までの数字を設定してください。");
       }catch(IOException e){
-         System.err.println("入出力エラーです\n" + e);
+          System.err.println("入出力エラーです\n" + e);
       }catch(Exception e){
-         System.err.println(e);
+          System.err.println(e);
       }
    }
+
+   public void in (){
+      try{
+         line = ios.readUTF();
+         System.out.println("受信:"+line);
+          
+      }catch(NumberFormatException  e){
+          System.err.println("引数はポート番号です。1000〜65535までの数字を設定してください。");
+      }catch(IndexOutOfBoundsException  e){
+          System.err.println("引数はポート番号です。1000〜65535までの数字を設定してください。");
+      }catch(IOException e){
+          System.err.println("入出力エラーです\n" + e);
+      }catch(Exception e){
+          System.err.println(e);
+      }
+  }
 
    void close(){
       try{
