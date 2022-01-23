@@ -1,3 +1,0 @@
-class Map {
-    int[][] map;
-}
