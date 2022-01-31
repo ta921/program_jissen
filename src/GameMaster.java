@@ -222,6 +222,11 @@ public class GameMaster extends Canvas implements KeyListener{
 
             livingCharaCount=4;
 
+            if(myChara.hp == 0){
+                buf_gc.setColor(Color.red);
+                buf_gc.drawString("Your Character Is Dead", 50, 60);
+            }
+
             for (i = 0; i<4; i++){
                 if(charaList[i].hp == 0){
                     livingCharaCount-=1;
@@ -232,7 +237,22 @@ public class GameMaster extends Canvas implements KeyListener{
                     charaList[i].move(buf_gc, imgW, imgH);
                 //printAroundWall();
                 }else{
-                    charaList[i].turn();
+
+                    if(isSingle){
+                        if(i > 0){
+                            charaList[i].turn();
+                        }
+                    }else{
+                        if(i > 1){
+                            charaList[i].turn();
+                        }
+                    }
+                }
+
+                if(i==0 && myChara.hp != 0){
+                    buf_gc.setColor(Color.blue);
+                    buf_gc.drawRect(charaList[i].x, charaList[i].y, 39, 39);
+
                 }
                 paintChara(charaList[i].num, charaList[i].vec, charaList[i].x, charaList[i].y);
 
